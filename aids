@@ -1,4 +1,4 @@
- local NotificationUI = Instance.new("ScreenGui")
+local NotificationUI = Instance.new("ScreenGui")
 local NotificationContainer = Instance.new("Frame")
 local UIListLayout = Instance.new("UIListLayout")
 local Template = Instance.new("TextLabel")
@@ -44,7 +44,7 @@ function Lib:Notify(Text, Duration)
     Notification.Visible = true 
     Notification.Parent = NotificationContainer
     Notification.Text = Text or ""
-    Notification.FontSize = Enum.FontSize.Size16
+    Notification.FontSize = Enum.FontSize.Size18
       
     spawn(function()
         if typeof(Duration) == "number" then
