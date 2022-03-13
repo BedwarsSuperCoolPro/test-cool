@@ -1,6 +1,13 @@
 local NotificationUI = Instance.new("ScreenGui")
 local Container = Instance.new("Frame")
 local UIListLayout = Instance.new("UIListLayout")
+local Template = Instance.new("Frame")
+local Shadows = Instance.new("Frame")
+local UmbraShadow = Instance.new("ImageLabel")
+local PenumbraShadow = Instance.new("ImageLabel")
+local AmbientShadow = Instance.new("ImageLabel")
+local TextLabel = Instance.new("TextLabel")
+local UITextSizeConstraint = Instance.new("UITextSizeConstraint")
 
 NotificationUI.Name = "NotificationUI"
 NotificationUI.Parent = game.Players.LocalPlayer:WaitForChild("PlayerGui")
@@ -10,34 +17,95 @@ Container.Name = "Container"
 Container.Parent = NotificationUI
 Container.BackgroundColor3 = Color3.fromRGB(255, 255, 255)
 Container.BackgroundTransparency = 1.000
-Container.Position = UDim2.new(0.415151536, 0, 0.476386011, 0)
-Container.Size = UDim2.new(0, 280, 0, 480)
+Container.Position = UDim2.new(0.42029357, 0, 0.0205338802, 0)
+Container.Size = UDim2.new(0, 305, 0, 495)
 
 UIListLayout.Parent = Container
 UIListLayout.HorizontalAlignment = Enum.HorizontalAlignment.Center
 UIListLayout.SortOrder = Enum.SortOrder.LayoutOrder
-UIListLayout.VerticalAlignment = Enum.VerticalAlignment.Bottom
-UIListLayout.Padding = UDim.new(0, 8)
+UIListLayout.Padding = UDim.new(0, 5)
+
+Template.Name = "Template"
+Template.Parent = NotificationUI
+Template.BackgroundColor3 = Color3.fromRGB(44, 44, 44)
+Template.BackgroundTransparency = 0.450
+Template.BorderSizePixel = 0
+Template.Position = UDim2.new(-0.0852458999, 0, 0, 0)
+Template.Size = UDim2.new(0, 357, 0, 47)
+Template.Visible = false
+
+Shadows.Name = "Shadows"
+Shadows.Parent = Template
+Shadows.BackgroundTransparency = 1.000
+Shadows.Size = UDim2.new(1, 0, 1, 0)
+
+UmbraShadow.Name = "UmbraShadow"
+UmbraShadow.Parent = Shadows
+UmbraShadow.AnchorPoint = Vector2.new(0.5, 0.5)
+UmbraShadow.BackgroundTransparency = 1.000
+UmbraShadow.Position = UDim2.new(0.5, 0, 0.349056602, 8)
+UmbraShadow.Size = UDim2.new(1, 10, 1, 10)
+UmbraShadow.Image = "rbxassetid://1316045217"
+UmbraShadow.ImageColor3 = Color3.fromRGB(0, 0, 0)
+UmbraShadow.ImageTransparency = 0.860
+UmbraShadow.ScaleType = Enum.ScaleType.Slice
+UmbraShadow.SliceCenter = Rect.new(10, 10, 118, 118)
+
+PenumbraShadow.Name = "PenumbraShadow"
+PenumbraShadow.Parent = Shadows
+PenumbraShadow.AnchorPoint = Vector2.new(0.5, 0.5)
+PenumbraShadow.BackgroundTransparency = 1.000
+PenumbraShadow.Position = UDim2.new(0.5, 0, 0.349056602, 8)
+PenumbraShadow.Size = UDim2.new(1, 10, 1, 10)
+PenumbraShadow.Image = "rbxassetid://1316045217"
+PenumbraShadow.ImageColor3 = Color3.fromRGB(0, 0, 0)
+PenumbraShadow.ImageTransparency = 0.880
+PenumbraShadow.ScaleType = Enum.ScaleType.Slice
+PenumbraShadow.SliceCenter = Rect.new(10, 10, 118, 118)
+
+AmbientShadow.Name = "AmbientShadow"
+AmbientShadow.Parent = Shadows
+AmbientShadow.AnchorPoint = Vector2.new(0.5, 0.5)
+AmbientShadow.BackgroundTransparency = 1.000
+AmbientShadow.Position = UDim2.new(0.5, 0, 0.349056602, 8)
+AmbientShadow.Size = UDim2.new(1, 10, 1, 10)
+AmbientShadow.Image = "rbxassetid://1316045217"
+AmbientShadow.ImageColor3 = Color3.fromRGB(0, 0, 0)
+AmbientShadow.ImageTransparency = 0.880
+AmbientShadow.ScaleType = Enum.ScaleType.Slice
+AmbientShadow.SliceCenter = Rect.new(10, 10, 118, 118)
+
+TextLabel.Parent = Template
+TextLabel.BackgroundColor3 = Color3.fromRGB(255, 255, 255)
+TextLabel.BackgroundTransparency = 1.000
+TextLabel.Size = UDim2.new(0, 357, 0, 47)
+TextLabel.Font = Enum.Font.Gotham
+TextLabel.Text = "This is a really cool notification"
+TextLabel.TextColor3 = Color3.fromRGB(255, 255, 255)
+TextLabel.TextScaled = true
+TextLabel.TextSize = 14.000
+TextLabel.TextWrapped = true
+
+UITextSizeConstraint.Parent = TextLabel
+UITextSizeConstraint.MaxTextSize = 14
 
 local Lib = {}
 
-function Lib.prompt(Text)
-      local Notification = Instance.new("TextLabel")
-      Notification.Parent = Container
-      Notification.Text = Text or ""
-      Notification.TextColor3 = Color3.new(255,255,255)
-      Notification.TextSize = Enum.FontSize.Size14 
-      Notification.Size = Vector3.(0, 271,0, 50)
-      Notification.Font = Enum.Font.Gotham 
-      Notification.BackgroundTransparency = 1 
+function Lib:Notify(Text, Duration)
+      local Notification = Template:Clone()
+      Notification.TextLabel.Text = Text 
+      Notification.Visible = true 
+      Notification.Parent = Container 
       
-      coroutine.wrap(function()
-          for i = 0,1,0.1 do
-                Notification.BackgroundTransparency = i 
-          end
-          wait(0.5)
-          Notification:Destroy()
-      end)()
+      spawn(function()
+            task.wait(Duration or 3)
+            for i = 0,1,0.1 do 
+                  Notification.BackgroundTransparency = i 
+                  Notification.TextLabel.TextTransparency = i
+            end
+            wait(0.05)
+            Notification:Destroy()
+      end)
 end
 
 return Lib
