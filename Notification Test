@@ -21,7 +21,7 @@ UIListLayout.SortOrder = Enum.SortOrder.LayoutOrder
 UIListLayout.VerticalAlignment = Enum.VerticalAlignment.Bottom
 UIListLayout.Padding = UDim.new(0, 8)
 
-function Lib:Notify(Text)
+function Lib.prompt(Text)
       local Notification = Instance.new("TextLabel")
       Notification.Parent = Container
       Notification.Text = Text or ""
