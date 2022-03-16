@@ -1,0 +1,42 @@
+if not game:IsLoaded() then
+    game.Loaded:Wait()
+end
+
+function Serverhop()
+    local t = {}
+    for _, v in ipairs(game:GetService("HttpService"):JSONDecode(game:HttpGetAsync("https://games.roblox.com/v1/games/" .. game.PlaceId .. "/servers/Public?sortOrder=Asc&limit=100")).data) do
+        if type(v) == "table" and v.maxPlayers > v.playing and v.id ~= game.JobId then
+            t[#t + 1] = v.id 
+        end
+    end
+    if #t > 0 then
+        game:GetService("TeleportService"):TeleportToPlaceInstance(game.PlaceId, t[math.random(1, #t)])
+    end
+end
+
+local BombRemote = game:GetService("ReplicatedStorage"):WaitForChild("Events"):WaitForChild("Bomb"):WaitForChild("ThrowBombRE")
+local ToolRemote = game:GetService("ReplicatedStorage"):WaitForChild("Events"):WaitForChild("Backpack"):WaitForChild("ToolEquipRE")
+local PromptOverlay = game:GetService("CoreGui"):WaitForChild("RobloxPromptGui"):WaitForChild("promptOverlay")
+
+ToolRemote:FireServer("Bomb")
+
+spawn(function()
+    for i = 1, 10 do
+        while true and task.wait() do
+            for i = 1, 3 do
+                BombRemote:FireServer(Vector3.new(), CFrame.new())
+            end
+            BombRemote:FireServer(Vector3.new(), CFrame.new())
+        end
+    end
+end)
+
+PromptOverlay.DescendantAdded:Connect(function(Child)
+    if Child.Name == "ErrorTitle" then
+        Child:GetPropertyChangedSignal("Text"):Connect(function()
+            if Child.Text:sub(0, 12) == "Disconnected" then
+                Serverhop()
+            end
+        end)
+    end
+end)
