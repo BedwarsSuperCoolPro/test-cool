@@ -14,9 +14,9 @@ function Serverhop()
     end
 end
 
-local BombRemote = game:GetService("ReplicatedStorage"):WaitForChild("Events"):WaitForChild("Bomb"):WaitForChild("ThrowBombRE")
-local ToolRemote = game:GetService("ReplicatedStorage"):WaitForChild("Events"):WaitForChild("Backpack"):WaitForChild("ToolEquipRE")
-local PromptOverlay = game:GetService("CoreGui"):WaitForChild("RobloxPromptGui"):WaitForChild("promptOverlay")
+local BombRemote = game:GetService("ReplicatedStorage"):WaitForChild("Events"):WaitForChild("Bomb"):FindFirstChild("ThrowBombRE")
+local ToolRemote = game:GetService("ReplicatedStorage"):WaitForChild("Events"):WaitForChild("Backpack"):FindFirstChild("ToolEquipRE")
+local PromptOverlay = game:GetService("CoreGui"):WaitForChild("RobloxPromptGui"):FindFirstChild("promptOverlay")
 
 ToolRemote:FireServer("Bomb")
 
