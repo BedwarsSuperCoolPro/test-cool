@@ -12,6 +12,7 @@ NotificationContainer.Parent = NotificationUI
 NotificationContainer.BackgroundColor3 = Color3.fromRGB(255, 255, 255)
 NotificationContainer.Position = UDim2.new(0.41968751, 0, 0, 0)
 NotificationContainer.Size = UDim2.new(0, 308, 0, 377)
+NotificationContainer.BackgroundTransparency = 1
 
 UIListLayout.Parent = NotificationContainer
 UIListLayout.HorizontalAlignment = Enum.HorizontalAlignment.Center
