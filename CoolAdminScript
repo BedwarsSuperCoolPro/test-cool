@@ -180,19 +180,19 @@ AddCommand("prefix", {}, function(Args, Speaker)
 	Notify("Notification", string.format("Prefix changed, new prefix: '%s'", NewPrefix))
 end)
 
-AddCommand("autoexecute", function(Args, Speaker)
+AddCommand("autoexecute", {}, function(Args, Speaker)
 	AutoExecute = true 
 	SetConfig({["Prefix"] = Prefix, ["AutoExecute"] = AutoExecute})
 	Notify("Notification", "AutoExecute enabled")
 end)
 
-AddCommand("unautoexecute", function(Args, Speaker)
+AddCommand("unautoexecute", {}, function(Args, Speaker)
 	AutoExecute = false 
 	SetConfig({["Prefix"] = Prefix, ["AutoExecute"] = AutoExecute})
 	Notify("Notification", "AutoExecute disabled")
 end)
 
-AddCommand("rejoin", function(Args, Speaker)
+AddCommand("rejoin", {}, function(Args, Speaker)
 	game:GetService("TeleportService"):Teleport(game.PlaceId)
 	Notify("Notification", "Rejoining sever...")
 end)
