@@ -173,6 +173,30 @@ AddCommand("unloopgoto", {}, function(Args, Speaker)
 	Notify("Notification", "Loopteleport stopped", 3)
 end)
 
+AddCommand("prefix", {}, function(Args, Speaker)
+	local NewPrefix = Args[2]
+	Prefix = NewPrefix
+	SetConfig({["Prefix"] = NewPrefix, ["AutoExecute"] = AutoExecute})
+	Notify("Notification", string.format("Prefix changed, new prefix: '%s'", NewPrefix))
+end)
+
+AddCommand("autoexecute", function(Args, Speaker)
+	AutoExecute = true 
+	SetConfig({["Prefix"] = Prefix, ["AutoExecute"] = AutoExecute})
+	Notify("Notification", "AutoExecute enabled")
+end)
+
+AddCommand("unautoexecute", function(Args, Speaker)
+	AutoExecute = false 
+	SetConfig({["Prefix"] = Prefix, ["AutoExecute"] = AutoExecute})
+	Notify("Notification", "AutoExecute disabled")
+end)
+
+AddCommand("rejoin", function(Args, Speaker)
+	game:GetService("TeleportService"):Teleport(game.PlaceId)
+	Notify("Notification", "Rejoining sever...")
+end)
+
 -- // Chatted Check \\ -- 
 game.Players.LocalPlayer.Chatted:Connect(function(Raw)
 	local Message = Raw 
