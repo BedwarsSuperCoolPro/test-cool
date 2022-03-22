@@ -207,7 +207,7 @@ game.Players.LocalPlayer.Chatted:Connect(function(Raw)
 
 	local Split = string.split(Message, " ")
 	if CommandsTbl[Split[1]] then
-		CommandsTbl[Split[1]].Function(Split)
+		CommandsTbl[Split[1]].Function(Split, game.Players.LocalPlayer)
 	end
 end)
 
