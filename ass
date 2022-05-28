@@ -1,0 +1,640 @@
+if not game:IsLoaded() then 
+     game.Loaded:Wait()
+end 
+
+local Start = tick()
+local Library = loadstring(game:HttpGetAsync("https://raw.githubusercontent.com/Just-Egg-Salad/roblox-scripts/main/uwuware"))()
+
+local ReplicatedStorage = game:GetService("ReplicatedStorage")
+local Players = game:GetService("Players")
+local RunService = game:GetService("RunService")
+local UserInputService = game:GetService("UserInputService")
+local HttpService = game:GetService("HttpService")
+local TeleportService = game:GetService("TeleportService")
+
+local Heartbeat = {}
+local RenderStepped = {}
+local Stepped = {}
+local Connections = {}
+
+local Client = Players.LocalPlayer 
+local CurrentCamera = Workspace.CurrentCamera
+local LocalMouse = Client:GetMouse()
+
+local function Notify(Text)
+     Client.PlayerGui.MainGui.Chat.ShowChatMessage:Fire(nil, Text)
+end
+
+local function BindToHeartbeat(Name, Func)
+     if Heartbeat[Name] == nil then
+          Heartbeat[Name] = RunService.Heartbeat:Connect(Func)
+     end
+end
+
+local function UnbindFromHeartbeat(Name)
+     if Heartbeat[Name] ~= nil then
+          Heartbeat[Name]:Disconnect()
+          Heartbeat[Name] = nil 
+     end
+end
+
+local function BindToRenderStep(Name, Func)
+     if RenderStepped[Name] == nil then
+          RenderStepped[Name] = RunService.RenderStepped:Connect(Func)
+     end
+end
+
+local function UnbindFromRenderStep(Name)
+     if RenderStepped[Name] ~= nil then
+          RenderStepped[Name]:Disconnect()
+          RenderStepped[Name] = nil 
+     end
+end
+
+local function BindToStepped(Name, Func)
+     if Stepped[Name] == nil then
+          Stepped[Name] = RunService.Stepped:Connect(Func)
+     end
+end
+
+local function UnbindFromStepped(Name)
+     if Stepped[Name] ~= nil then
+          Stepped[Name]:Disconnect()
+          Stepped[Name] = nil 
+     end
+end
+
+local function BindConnection(Name, Connection, Func)
+     if Connections[Name] == nil then 
+         Connections[Name] = Connection:Connect(Func)
+     end 
+end 
+
+local function UnbindConnection(Name)
+     if Connections[Name] ~= nil then 
+         Connections[Name]:Disconnect()
+         Connections[Name] = nil 
+     end 
+end 
+
+local function GetClosestHumanoidToPosition()
+     local Closest = nil 
+     local Distance = Library.flags.AttackDistance 
+     for _, Plr in pairs(Players:GetPlayers()) do
+          if Plr ~= Client and Plr.Character and Plr.Character:FindFirstChild("HumanoidRootPart") and Plr.Character:FindFirstChild("Humanoid") and Plr.Character.Humanoid.Health > 0 and Client.Character and Client.Character:FindFirstChild("HumanoidRootPart") and Client.Character:FindFirstChild("Humanoid") and Client.Character.Humanoid.Health > 0 then
+               local Magnitude = (Client.Character.HumanoidRootPart.Position - Plr.Character.HumanoidRootPart.Position).Magnitude 
+               if Magnitude <= Distance then
+                    Distance = Magnitude
+                    Closest = Plr 
+               end
+          end
+     end
+     return Closest
+end
+
+local function GetClosestHumanoidToMouse()
+     local Closest = nil 
+     local Distance = 1600
+     for _, Plr in pairs(Players.GetPlayers(Players)) do
+          if Plr ~= Client and Plr.Character and Plr.Character.FindFirstChild(Plr.Character, "HumanoidRootPart") and Plr.Character.FindFirstChild(Plr.Character, "Humanoid") and Plr.Character.Humanoid.Health > 0 then
+               local MousePosition = UserInputService.GetMouseLocation(UserInputService)
+               local Vector, OnScreen = CurrentCamera.WorldToScreenPoint(CurrentCamera, Plr.Character.HumanoidRootPart.Position)
+               if OnScreen then
+                    local Magnitude = (MousePosition - Vector2.new(Vector.X, Vector.Y)).Magnitude
+                    if Magnitude <= Distance then
+                         Distance = Magnitude
+                         Closest = Plr 
+                    end
+               end
+          end
+     end
+     return Closest
+end
+
+local function Touch(Part1, Part2)
+     pcall(function()
+          firetouchinterest(Part1, Part2, 0)
+          firetouchinterest(Part1, Part2, 1)
+     end)
+end
+
+local function Stop()
+     Library.flags.Fly = false 
+     UnbindConnection("KeyUp")
+     UnbindConnection("KeyDown")
+     if Client.Character:FindFirstChild("Humanoid") then
+          Client.Character:FindFirstChild("Humanoid").PlatformStand = false 
+     end
+     pcall(function() CurrentCamera.CameraType = Enum.CameraType.Classic end)
+end
+
+local function GetMurderer()
+     local Murderer = nil 
+     for _, v in pairs(Players:GetPlayers()) do
+         if v.Character and v.Character:FindFirstChild("Knife") or v.Backpack:FindFirstChild("Knife") then 
+             Murderer = v 
+         end 
+     end 
+     return Murderer
+end 
+
+local function GetSheriff()
+     local Sheriff = nil 
+     for _, v in pairs(Players:GetPlayers()) do
+         if v.Character and v.Character:FindFirstChild("Revolver") or v.Backpack:FindFirstChild("Revolver") then 
+             Sheriff = v 
+         end 
+     end 
+     return Sheriff
+end 
+
+local Combat = Library:CreateWindow("Combat")
+local Visuals = Library:CreateWindow("Visuals")
+local Farming = Library:CreateWindow("Farming")
+local Miscellaneous = Library:CreateWindow("Miscellaneous")
+local Settings = Library:CreateWindow("Settings")
+
+local Character = Combat:AddFolder("Character")
+local Sheriff = Combat:AddFolder("Sheriff")
+local Murderer = Combat:AddFolder("Murderer")
+local Chams = Visuals:AddFolder("Chams")
+local AutoFarm = Farming:AddFolder("AutoFarm")
+local Cases = Farming:AddFolder("Cases")
+local Teleports = Miscellaneous:AddFolder("Teleports")
+local Server = Miscellaneous:AddFolder("Server")
+local Keybinds = Miscellaneous:AddFolder("Keybinds")
+local Settings = Settings:AddFolder("Settings")
+
+local WalkSpeed = Character:AddSlider({text = "WalkSpeed", flag = "WalkSpeed", value = 16, min = 0, max = 100, callback = function(a) 
+     Client.Character.Humanoid.WalkSpeed = a 
+end})
+
+local JumpPower = Character:AddSlider({text = "JumpPower", flag = "JumpPower", value = 50, min = 0, max = 100, callback = function(a) 
+     Client.Character.Humanoid.JumpPower = a 
+end})
+
+local FlySpeed = Character:AddSlider({text = "FlySpeed", flag = "FlySpeed", value = 10, min = 0, max = 100, callback = function(a) 
+     
+end})
+
+local SpinSpeed = Character:AddSlider({text = "SpinSpeed", flag = "SpinSpeed", value = 20, min = 0, max = 100, callback = function(a) 
+     
+end})
+
+local GrabRevolver = Character:AddButton({text = "Grab Revolver", flag = "GrabRevolver", callback = function() 
+     for _, v in pairs(Workspace:GetChildren()) do
+          if v:IsA("Model") and v.Name == "RevolverPickUp" then
+               local Orb = v:FindFirstChild("Orb")
+               if Orb then
+                    Touch(Orb, Client.Character.HumanoidRootPart)
+               end
+          end
+     end
+end})
+
+local GrabCoins = Character:AddButton({text = "Grab Coins", flag = "GrabCoins", callback = function() 
+     for _, v in pairs(Workspace:GetChildren()) do
+          if v:IsA("Part") and v.Name == "Coin" then
+               Touch(v, Client.Character.HumanoidRootPart)
+          end
+     end
+end})
+
+local CollectDaily = Character:AddButton({text = "Collect Daily Coins", flag = "GrabRevolver", callback = function() 
+     Touch(Workspace.Lobby.DailyHunterCoinsDetector, Client.Character.HumanoidRootPart)
+end})
+
+local Fly = Character:AddToggle({text = "Fly", flag = "Fly", state = false, callback = function(a) 
+      local Root = Client.Character:FindFirstChild("HumanoidRootPart")
+      local Control, LControl = {F = 0, B = 0, L = 0, R = 0, Q = 0, E = 0}, {F = 0, B = 0, L = 0, R = 0, Q = 0, E = 0}
+      local Speed = 0 
+
+      local function Start()
+          local BV = Instance.new("BodyVelocity", Root)
+          local BG = Instance.new("BodyGyro", Root)
+          BV.Velocity = Vector3.new(0,0,0)
+          BV.MaxForce = Vector3.new(9e9,9e9,9e9)
+          BG.P = 9e4 
+          BG.MaxTorque = Vector3.new(9e9,9e9,9e9)
+          BG.CFrame = Root.CFrame 
+          task.spawn(function()
+               repeat wait()
+                    if Client.Character:FindFirstChild("Humanoid") then
+					Client.Character:FindFirstChild("Humanoid").PlatformStand = true
+				end
+				if Control.L + Control.R ~= 0 or Control.F + Control.B ~= 0 or Control.Q + Control.E ~= 0 then
+					Speed = 50
+				elseif not (Control.L + Control.R ~= 0 or Control.F + Control.B ~= 0 or Control.Q + Control.E ~= 0) and Speed ~= 0 then
+					Speed = 0
+				end
+				if (Control.L + Control.R) ~= 0 or (Control.F + Control.B) ~= 0 or (Control.Q + Control.E) ~= 0 then
+					BV.Velocity = ((CurrentCamera.CoordinateFrame.lookVector * (Control.F + Control.B)) + ((CurrentCamera.CoordinateFrame * CFrame.new(Control.L + Control.R, (Control.F + Control.B + Control.Q + Control.E) * 0.2, 0).p) - CurrentCamera.CoordinateFrame.p)) * Speed
+					LControl = {F = Control.F, B = Control.B, L = Control.L, R = Control.R}
+				elseif (Control.L + Control.R) == 0 and (Control.F + Control.B) == 0 and (Control.Q + Control.E) == 0 and Speed ~= 0 then
+					BV.Velocity = ((CurrentCamera.CoordinateFrame.lookVector * (LControl.F + LControl.B)) + ((CurrentCamera.CoordinateFrame * CFrame.new(LControl.L + LControl.R, (LControl.F + LControl.B + Control.Q + Control.E) * 0.2, 0).p) - CurrentCamera.CoordinateFrame.p)) * Speed
+				else
+					BV.Velocity = Vector3.new(0, 0, 0)
+				end
+				BG.CFrame = CurrentCamera.CoordinateFrame
+               until not Library.flags.Fly
+               Control, LControl = {F = 0, B = 0, L = 0, R = 0, Q = 0, E = 0}, {F = 0, B = 0, L = 0, R = 0, Q = 0, E = 0}
+               Speed = 0 
+               BV:Destroy()
+               BG:Destroy() 
+               if Client.Character:FindFirstChild("Humanoid") then
+                    Client.Character:FindFirstChild("Humanoid").PlatformStand = false 
+               end
+               UnbindConnection("KeyUp")
+               UnbindConnection("KeyDown")
+          end)
+      end
+      BindConnection("KeyDown", LocalMouse.KeyDown, function(Key)
+         if Key:lower() == "w" then
+			 Control.F = (Library.flags.FlySpeed)
+		 elseif Key:lower() == "s" then
+			 Control.B = - (Library.flags.FlySpeed)
+		 elseif Key:lower() == "a" then
+			 Control.L = - (Library.flags.FlySpeed)
+		 elseif Key:lower() == "d" then 
+			 Control.R = (Library.flags.FlySpeed)
+		 end
+		 pcall(function() CurrentCamera.CameraType = Enum.CameraType.Track end)
+      end)
+	  BindConnection("KeyUp", LocalMouse.KeyUp, function(Key)
+	     if Key:lower() == "w" then
+			 Control.F = 0
+		 elseif Key:lower() == "s" then
+			 Control.B = 0
+		 elseif Key:lower() == "a" then
+			 Control.L = 0
+		 elseif Key:lower() == "d" then
+			 Control.R = 0
+		 end
+	  end)
+	  Start()
+end})
+
+local Noclip = Character:AddToggle({text = "Noclip", flag = "Noclip", state = false, callback = function(a) 
+     if a then
+          BindToStepped("Noclip", function()
+               for _, v in pairs(Client.Character:GetChildren()) do
+                    if v:IsA("BasePart") and v.CanCollide then
+                         v.CanCollide = false 
+                    end
+               end
+          end)
+     else
+          UnbindFromStepped("Noclip")
+     end
+end})
+
+local SpinBot = Character:AddToggle({text = "SpinBot", flag = "SpinBot", state = false, callback = function(a) 
+     if a then
+          BindToRenderStep("SpinBot", function()
+               if Spin == nil or Spin ~= nil and Spin.Parent ~= Client.Character:FindFirstChild("HumanoidRootPart") then
+                    Spin = Instance.new("BodyAngularVelocity")
+                    Spin.MaxTorque = Vector3.new(0,math.huge,0)
+                    Spin.AngularVelocity = Vector3.new(0,Library.flags.SpinSpeed,0)
+                    Spin.Parent = Client.Character:FindFirstChild("HumanoidRootPart")
+               else
+                    Spin.AngularVelocity = Vector3.new(0,Library.flags.SpinSpeed,0)
+               end
+          end)
+     else
+          if Spin then
+               Spin:Destroy()
+          end
+          UnbindFromRenderStep("SpinBot")
+     end
+end})
+
+local InfJump = Character:AddToggle({text = "InfJump", flag = "InfJump", state = false, callback = function(a) 
+     if a then 
+         BindConnection("InfJump", UserInputService.JumpRequest, function()
+             Client.Character.Humanoid:ChangeState(3)
+         end)
+     else 
+         UnbindConnection("InfJump")
+     end 
+end})
+
+local SilentAim = Sheriff:AddToggle({text = "SilentAim", flag = "SilentAim", state = false, callback = function(a) 
+     
+end})
+
+local AttackAura = Murderer:AddToggle({text = "AttackAura", flag = "AttackAura", state = false, callback = function(a) 
+     if a then
+          BindToRenderStep("AttackAura", function()
+               local ClosestPlayer = GetClosestHumanoidToPosition()
+               local Knife = Client.Character and Client.Character:FindFirstChild("Knife")
+               if ClosestPlayer and Knife then
+                    Knife.KnifeScript.HitPlayer:FireServer(ClosestPlayer.Character.HumanoidRootPart)
+                    Knife.KnifeScript.ClientStab:FireServer()
+               end
+          end)
+     else
+          UnbindFromRenderStep("AttackAura")
+     end
+end})
+
+local KillSheriff = Murderer:AddButton({text = "Kill Sheriff", flag = "KillSheriff", callback = function() 
+     Client.Character.HumanoidRootPart.CFrame = GetSheriff().Character.HumanoidRootPart.CFrame * CFrame.new(3,0,0)
+     wait(0.3)
+     Client.Character.Knife.KnifeScript.HitPlayer:FireServer(GetSheriff().Character.HumanoidRootPart)
+     Client.Character.Knife.KnifeScript.ClientStab:FireServer()
+end})
+
+local KillAll = Murderer:AddButton({text = "Kill All", flag = "KillAll", callback = function() 
+     for _, v in pairs(ReplicatedStorage.Interactions.Server.GetPlayingPlayers:InvokeServer()) do 
+         if v ~= Client and v.Character and v.Character:FindFirstChild("HumanoidRootPart") and Client.Character:FindFirstChild("Knife") then 
+             Client.Character.HumanoidRootPart.CFrame = v.Character.HumanoidRootPart.CFrame * CFrame.new(0,0,1)
+             Client.Character.Knife.KnifeScript.HitPlayer:FireServer(v.Character.HumanoidRootPart)
+             Client.Character.Knife.KnifeScript.ClientStab:FireServer()
+             wait(0.3)
+         end 
+     end 
+end})
+
+local AttackDistance = Murderer:AddSlider({text = "AttackAura Distance", flag = "AttackDistance", value = 8, min = 0, max = 12, callback = function(a) 
+     
+end})
+
+local ChamsFolder = Instance.new("Folder")
+ChamsFolder.Parent = Workspace 
+ChamsFolder.Name = "ChamsFolder"
+local Cham = Chams:AddToggle({text = "Chams", flag = "Cham", state = false, callback = function(a) 
+     if a then
+          BindToRenderStep("Chams", function()
+               for _, v in pairs(Players:GetPlayers()) do
+                    local Cool = nil 
+                    if ChamsFolder:FindFirstChild(v.Name) then
+                         Cool = ChamsFolder[v.Name]
+                         Cool.Enabled = false 
+                         Cool.FillColor = Library.flags.ChamsColor
+                         Cool.OutlineColor = Library.flags.OutlineColor
+                    end
+                    if v ~= Client and v.Character and v.Character:FindFirstChild("HumanoidRootPart") and v.Character:FindFirstChild("Humanoid") and v.Character.Humanoid.Health > 0 then
+                         if not ChamsFolder:FindFirstChild(v.Name) then
+                              local Cham = Instance.new("Highlight")
+                              Cham.Parent = ChamsFolder
+                              Cham.Name = v.Name 
+                              Cool = Cham 
+                         end
+                         Cool.Enabled = true 
+                         Cool.Adornee = v.Character
+                         Cool.OutlineTransparency = Library.flags.OutlineTransparency / 100 
+                         Cool.DepthMode = Enum.HighlightDepthMode.AlwaysOnTop
+                         Cool.FillTransparency = Library.flags.Transparency / 100
+                    end
+               end
+          end)
+     else
+          UnbindFromRenderStep("Chams")
+          ChamsFolder:ClearAllChildren()
+     end
+end})
+
+local ChamsColor = Chams:AddColor({text = "Player Color", flag = "ChamsColor", color = Color3.fromRGB(196, 40, 28), callback = function(a) 
+     
+end})
+
+local OutlineColor = Chams:AddColor({text = "Outline Color", flag = "OutlineColor", color = Color3.fromRGB(255,255,255), callback = function(a) 
+     
+end})
+
+local Transparency = Chams:AddSlider({text = "Transparency", flag = "Transparency", value = 50, min = 0, max = 100, callback = function(a) 
+     
+end})
+
+local OutlineTransparency = Chams:AddSlider({text = "Outline Transparency", flag = "OutlineTransparency", value = 1, min = 0, max = 100, callback = function(a) 
+     
+end})
+
+local CoinFarm = AutoFarm:AddToggle({text = "CoinFarm", flag = "CoinFarm", state = false, callback = function(a) 
+     if a then
+          BindToHeartbeat("CoinFarm", function()
+               for _, v in pairs(Workspace:GetChildren()) do
+                    if v:IsA("Part") and v.Name == "Coin" then
+                         Touch(v, Client.Character.HumanoidRootPart)
+                    end
+               end
+          end)
+     else
+          UnbindFromHeartbeat("CoinFarm")
+     end
+end})
+
+local XPFarm = AutoFarm:AddToggle({text = "XPFarm", flag = "XPFarm", state = false, callback = function(a) 
+     while Library.flags.XPFarm do wait(1) 
+          if Client.Character and Client.Character:FindFirstChild("HumanoidRootPart") then
+               Client.Character.HumanoidRootPart.CFrame = Workspace.Lobby.Spawns.Model.SpawnLocation.CFrame * CFrame.new(0,3,0)
+          end
+     end
+end})
+
+local AutoCraft = AutoFarm:AddToggle({text = "AutoCraft", flag = "AutoCraft", state = false, callback = function(a) 
+     while Library.flags.AutoCraft do wait(0.3) 
+          for _, r in pairs(ReplicatedStorage.Recipes:GetChildren()) do 
+              for _, k in pairs(Client.Inventory.KnifeSkins:GetChildren()) do 
+                  if r.Ingredients:FindFirstChild(k.Name) then 
+                      ReplicatedStorage.Interactions.Server.CraftItem:InvokeServer(r.Ingredients.Parent, 1)
+                  end 
+              end 
+              for _, g in pairs(Client.Inventory.RevolverSkins:GetChildren()) do 
+                  if r.Ingredients:FindFirstChild(g.Name) then 
+                      ReplicatedStorage.Interactions.Server.CraftItem:InvokeServer(r.Ingredients.Parent, 1)
+                  end 
+              end 
+          end 
+     end
+end})
+
+
+local KnifeList = Cases:AddList({text = "Knife Crate", flag = "KnifeList", value = "Select a Crate", values = {"Knife Box #1", "Knife Box #2", "Knife Box #3", "Knife Box #4"}, callback = function(a) 
+     
+end})
+
+local RevolverList = Cases:AddList({text = "Revolver Crate", flag = "RevolverList", value = "Select a Crate", values = {"Revolver Box #1", "Revolver Box #2", "Revolver Box #3", "Revolver Box #4"}, callback = function(a) 
+     
+end})
+
+local AutoKnife = Cases:AddToggle({text = "AutoOpen Knifes", flag = "AutoKnife", state = false, callback = function(a) 
+     while Library.flags.AutoKnife do wait(0.3)
+          if Library.flags.KnifeList ~= "Select a Crate" then
+               ReplicatedStorage.Interactions.Server.BuyShopItem:InvokeServer(ReplicatedStorage.ShopEntries.KnifeSkins:FindFirstChild(Library.flags.KnifeList))
+               wait(0.3)
+               for _, c in pairs(getconnections(Client.PlayerGui.MainGui.CaseOpen.Close.MouseButton1Click)) do
+                   c:Fire()
+               end
+          end
+     end
+end})
+
+local AutoRevolver = Cases:AddToggle({text = "AutoOpen Revolvers", flag = "AutoRevolver", state = false, callback = function(a) 
+     while Library.flags.AutoRevolver do wait(0.3)
+          if Library.flags.RevolverList ~= "Select a Crate" then
+               ReplicatedStorage.Interactions.Server.BuyShopItem:InvokeServer(ReplicatedStorage.ShopEntries.RevolverSkins:FindFirstChild(Library.flags.RevolverList))
+               wait(0.3)
+               for _, c in pairs(getconnections(Client.PlayerGui.MainGui.CaseOpen.Close.MouseButton1Click)) do
+                   c:Fire()
+               end
+          end
+     end
+end})
+
+local LobbyTeleport = Teleports:AddButton({text = "Teleport to Lobby", flag = "LobbyTeleport", callback = function() 
+     Client.Character.HumanoidRootPart.CFrame = Workspace.Lobby.Spawns.Model.SpawnLocation.CFrame * CFrame.new(0,3,0)
+end})
+
+local GameTeleport = Teleports:AddButton({text = "Teleport to Game", flag = "GameTeleport", callback = function() 
+     Client.Character.HumanoidRootPart.CFrame = Workspace.Map.Spawn.CFrame * CFrame.new(0,3,0)
+end})
+
+local TeleportMurderer = Teleports:AddButton({text = "Teleport to Murderer", flag = "TeleportMurderer", callback = function() 
+     Client.Character.HumanoidRootPart.CFrame = GetMurderer().Character.HumanoidRootPart.CFrame * CFrame.new(3,0,0)
+end})
+
+local TeleportSheriff = Teleports:AddButton({text = "Teleport to Sheriff", flag = "TeleportSheriff", callback = function() 
+     Client.Character.HumanoidRootPart.CFrame = GetSheriff().Character.HumanoidRootPart.CFrame * CFrame.new(3,0,0)
+end})
+
+local SpamMessage = Server:AddBox({text = "Spam Message", flag = "SpamMessage", value = "Message Here", callback = function(a) 
+     
+end})
+
+local Spam = Server:AddToggle({text = "Spam", flag = "Spam", state = false, callback = function(a) 
+     while Library.flags.Spam do wait()
+          if Library.flags.SpamMessage ~= "Message Here" then
+               ReplicatedStorage.Interactions.Server.SendChatMessage:FireServer(Library.flags.SpamMessage)
+          end
+     end
+end})
+
+local SpamSounds = Server:AddToggle({text = "Spam Sounds", flag = "SpamSounds", state = false, callback = function(a) 
+     while Library.flags.SpamSounds do wait(0.8)
+          for _, v in pairs(Workspace:GetDescendants()) do
+               if v:IsA("Sound") then
+                    v:Play()
+               end
+          end
+     end
+end})
+
+local Spasm = Server:AddToggle({text = "Spasm", flag = "Spasm", state = false, callback = function(a) 
+     if a then 
+         BindToRenderStep("Spasm", function()
+             ReplicatedStorage.Interactions.Server.SendChatMessage:FireServer("/e die")
+             wait(0.08)
+             ReplicatedStorage.Interactions.Server.SendChatMessage:FireServer("/e sit")
+             wait(0.08)
+             ReplicatedStorage.Interactions.Server.SendChatMessage:FireServer("/e spin")
+         end)
+     else 
+         UnbindFromRenderStep("Spasm") 
+     end 
+end})
+
+local KillAll = Keybinds:AddBind({text = "Kill All", flag = "KillAllK", key = "", callback = function() 
+     for _, v in pairs(ReplicatedStorage.Interactions.Server.GetPlayingPlayers:InvokeServer()) do 
+         if v ~= Client and v.Character and v.Character:FindFirstChild("HumanoidRootPart") and Client.Character:FindFirstChild("Knife") then 
+             Client.Character.HumanoidRootPart.CFrame = v.Character.HumanoidRootPart.CFrame * CFrame.new(0,0,1)
+             Client.Character.Knife.KnifeScript.HitPlayer:FireServer(v.Character.HumanoidRootPart)
+             Client.Character.Knife.KnifeScript.ClientStab:FireServer()
+             wait(0.3)
+         end 
+     end 
+end})
+
+local KillSheriff = Keybinds:AddBind({text = "Kill Sheriff", flag = "KillSheriffR", key = "", callback = function() 
+     Client.Character.HumanoidRootPart.CFrame = GetSheriff().Character.HumanoidRootPart.CFrame * CFrame.new(3,0,0)
+     wait(0.3)
+     Client.Character.Knife.KnifeScript.HitPlayer:FireServer(GetSheriff().Character.HumanoidRootPart)
+     Client.Character.Knife.KnifeScript.ClientStab:FireServer()
+end})
+
+local TeleportFoward = Keybinds:AddBind({text = "Teleport Foward", flag = "TeleportFowardF", key = "", callback = function() 
+     Client.Character.HumanoidRootPart.CFrame *= CFrame.new(0,0,-5)
+end})
+
+local TeleportMurderer = Keybinds:AddBind({text = "Teleport to Murderer", flag = "TeleportMurderer", key = "", callback = function() 
+     Client.Character.HumanoidRootPart.CFrame = GetMurderer().Character.HumanoidRootPart.CFrame * CFrame.new(3,0,0)
+end})
+
+local TeleportSheriff = Keybinds:AddBind({text = "Teleport to Sheriff", flag = "TeleportMurderer", key = "", callback = function() 
+     Client.Character.HumanoidRootPart.CFrame = GetSheriff().Character.HumanoidRootPart.CFrame * CFrame.new(3,0,0)
+end})
+
+local GrabGun = Keybinds:AddBind({text = "Grab Gun", flag = "GrabGun", key = "", callback = function() 
+     for _, v in pairs(Workspace:GetChildren()) do
+          if v:IsA("Model") and v.Name == "RevolverPickUp" then
+               local Orb = v:FindFirstChild("Orb")
+               if Orb then
+                    Touch(Orb, Client.Character.HumanoidRootPart)
+               end
+          end
+     end
+end})
+
+local LobbyTeleport = Keybinds:AddBind({text = "Lobby Teleport", flag = "GrabGun", key = "", callback = function() 
+     Client.Character.HumanoidRootPart.CFrame = Workspace.Lobby.Spawns.Model.SpawnLocation.CFrame * CFrame.new(0,3,0)
+end})
+
+local GameTeleport = Keybinds:AddBind({text = "Game Teleport", flag = "GrabGun", key = "", callback = function() 
+     Client.Character.HumanoidRootPart.CFrame = Workspace.Map.Spawn.CFrame * CFrame.new(0,3,0)
+end})
+
+local Rejoin = Keybinds:AddBind({text = "Rejoin", flag = "Rejoin", key = "", callback = function() 
+     if #Players:GetPlayers() <= 1 then 
+         TeleportService:Teleport(game.PlaceId, Client)
+     else 
+         TeleportService:TeleportToPlaceInstance(game.PlaceId, game.JobId, Client)
+     end 
+end})
+
+local ServerHop = Keybinds:AddBind({text = "ServerHop", flag = "ServerHop", key = "", callback = function() 
+     local Servers = {}
+     for _, v in ipairs(HttpService:JSONDecode(game:HttpGet(string.format("https://games.roblox.com/v1/games/%s/servers/Public?sortOrder=Asc&limit=100", game.PlaceId))).data) do 
+         if type(v) == "table" and v.maxPlayers > v.playing and v.id ~= game.JobId then 
+             Servers[#Servers + 1] = v.id 
+         end 
+     end 
+     if #Servers > 0 then 
+         TeleportService:TeleportToPlaceInstance(game.PlaceId, Servers[math.random(1,#Servers)])
+     end 
+end})
+
+BindConnection("PlayerLeft", Players.PlayerRemoving, function()
+     if ChamsFolder:FindFirstChild(Plr.Name) then
+          ChamsFolder[Plr.Name]:Destroy()
+     end
+end)
+
+BindConnection("CharacterAdded", Client.CharacterAdded, function()
+     Stop()
+end)
+
+local OldNameCall1 = nil 
+OldNameCall1 = hookmetamethod(game, "__namecall", function(Self, ...)
+     local Method = getnamecallmethod() or {...}
+     if Method == "Kick" and Self == Client then
+          return wait(9e9)
+     end
+     return OldNameCall1(Self, ...)
+end)
+
+local OldNameCall2 = nil 
+OldNameCall2 = hookmetamethod(game, "__namecall", function(Self, ...)
+     local Args = {...}
+     local Method = getnamecallmethod()
+     if Method == "FireServer" and tostring(Self) == "ClientLeftDown" and Library.flags.SilentAim then
+          local ClosestPlayer = GetClosestHumanoidToMouse()
+          if ClosestPlayer then
+               Args[1] = ClosestPlayer.Character.HumanoidRootPart.Position
+               Args[2] = ClosestPlayer.Character.HumanoidRootPart
+          end
+     end
+     return OldNameCall2(Self, table.unpack(Args))
+end)
+
+Library:Init()
+Notify(string.format("[Success]: Script loaded in %s seconds", math.floor(tick() - Start)))
