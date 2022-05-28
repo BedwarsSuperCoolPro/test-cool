@@ -136,7 +136,7 @@ local function GetMurderer()
              Murderer = v 
          end 
      end 
-     return Murderer
+     return Murderer or "No murderer"
 end 
 
 local function GetSheriff()
@@ -146,7 +146,7 @@ local function GetSheriff()
              Sheriff = v 
          end 
      end 
-     return Sheriff
+     return Sheriff or "No sheriff"
 end 
 
 local function IsAlive(Plr)
@@ -698,7 +698,7 @@ BindConnection("ChildAdded", Workspace.ChildAdded, function(Child)
 end)
 
 for _, v in pairs(getconnections(Client.PlayerGui.MainGui.ChatTypeArea.TypeArea.FocusLost)) do 
-    v:Disable()
+     v:Disable()
 end 
 
 BindConnection("FocusLost", Client.PlayerGui.MainGui.ChatTypeArea.TypeArea.FocusLost, function()
@@ -726,8 +726,8 @@ BindConnection("FocusLost", Client.PlayerGui.MainGui.ChatTypeArea.TypeArea.Focus
                  repeat 
                      if v.Character:FindFirstChild("HumanoidRootPart") and v.Character:FindFirstChild("Humanoid") and v.Character.Humanoid.Health > 0 then 
                          Client.Character.HumanoidRootPart.CFrame = v.Character.HumanoidRootPart.CFrame * CFrame.new(0,0,1)
-                         Client.Knife.KnifeScript.HitPlayer:FireServer(v.Character.HumanoidRootPart)
-                         Client.Knife.KnifeScript.ClientStab:FireServer()
+                         Client.Character.Knife.KnifeScript.HitPlayer:FireServer(v.Character.HumanoidRootPart)
+                         Client.Character.Knife.KnifeScript.ClientStab:FireServer()
                      else 
                          break 
                      end 
@@ -735,9 +735,8 @@ BindConnection("FocusLost", Client.PlayerGui.MainGui.ChatTypeArea.TypeArea.Focus
                  until not IsAlive(v)
              end 
          end 
-     else 
-         ReplicatedStorage.Interactions.Server.SendChatMessage:FireServer(Text)
      end 
+     ReplicatedStorage.Interactions.Server.SendChatMessage:FireServer(Client.PlayerGui.MainGui.ChatTypeArea.TypeArea.Text)
      Client.PlayerGui.MainGui.ChatTypeArea.TypeArea.Text = ""
 end)
 
