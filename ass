@@ -20,6 +20,7 @@ local Connections = {}
 local Client = Players.LocalPlayer 
 local CurrentCamera = Workspace.CurrentCamera
 local LocalMouse = Client:GetMouse()
+local Prefix = "!"
 
 local function Notify(Text)
      Client.PlayerGui.MainGui.Chat.ShowChatMessage:Fire(nil, Text)
@@ -146,6 +147,22 @@ local function GetSheriff()
          end 
      end 
      return Sheriff
+end 
+
+local function IsAlive(Plr)
+     if Plr.Character and Plr.Character:FindFirstChild("Humanoid") and Plr.Character.Humanoid.Health > 0 then 
+         return true 
+     end 
+end 
+
+local function GetPlayersByName(Name)
+     local Name,Len,Found = string.lower(Name), #Name, {}
+     for _, v in pairs(Players:GetPlayers()) do 
+         if string.sub(string.lower(v.Name),1,Len) == Name or string.sub(string.lower(v.DisplayName),1,Len) == Name then 
+             table.insert(Found, v)
+         end 
+     end
+     return Found
 end 
 
 local Combat = Library:CreateWindow("Combat")
@@ -318,6 +335,17 @@ local InfJump = Character:AddToggle({text = "InfJump", flag = "InfJump", state =
      end 
 end})
 
+local AutoGun = Character:AddToggle({text = "AutoGrab Gun", flag = "AutoGun", state = false, callback = function(a) 
+     for _, v in pairs(Workspace:GetChildren()) do
+          if v:IsA("Model") and v.Name == "RevolverPickUp" then
+               local Orb = v:FindFirstChild("Orb")
+               if Orb then
+                    Touch(Orb, Client.Character.HumanoidRootPart)
+               end
+          end
+     end
+end})
+
 local SilentAim = Sheriff:AddToggle({text = "SilentAim", flag = "SilentAim", state = false, callback = function(a) 
      
 end})
@@ -350,6 +378,24 @@ local KillAll = Murderer:AddButton({text = "Kill All", flag = "KillAll", callbac
              Client.Character.HumanoidRootPart.CFrame = v.Character.HumanoidRootPart.CFrame * CFrame.new(0,0,1)
              Client.Character.Knife.KnifeScript.HitPlayer:FireServer(v.Character.HumanoidRootPart)
              Client.Character.Knife.KnifeScript.ClientStab:FireServer()
+             wait(0.3)
+         end 
+     end 
+end})
+
+local KillAll2 = Murderer:AddButton({text = "Kill All 2", flag = "KillAll2", callback = function() 
+     for _, v in pairs(ReplicatedStorage.Interactions.Server.GetPlayingPlayers:InvokeServer()) do 
+         if v ~= Client and v.Character and Client.Character:FindFirstChild("Knife") then 
+             repeat 
+                 if v.Character:FindFirstChild("HumanoidRootPart") and v.Character:FindFirstChild("Humanoid") and v.Character.Humanoid.Health > 0 then 
+                     Client.Character.HumanoidRootPart.CFrame = v.Character.HumanoidRootPart.CFrame * CFrame.new(0,0,1)
+                     Client.Character.Knife.KnifeScript.HitPlayer:FireServer(v.Character.HumanoidRootPart)
+                     Client.Character.Knife.KnifeScript.ClientStab:FireServer()
+                 else 
+                     break 
+                 end 
+                 RunService.Heartbeat:Wait()
+             until not IsAlive(v)
              wait(0.3)
          end 
      end 
@@ -534,7 +580,7 @@ local Spasm = Server:AddToggle({text = "Spasm", flag = "Spasm", state = false, c
      end 
 end})
 
-local KillAll = Keybinds:AddBind({text = "Kill All", flag = "KillAllK", key = "", callback = function() 
+local KillAll = Keybinds:AddBind({text = "Kill All", flag = "KillAll", key = "", callback = function() 
      for _, v in pairs(ReplicatedStorage.Interactions.Server.GetPlayingPlayers:InvokeServer()) do 
          if v ~= Client and v.Character and v.Character:FindFirstChild("HumanoidRootPart") and Client.Character:FindFirstChild("Knife") then 
              Client.Character.HumanoidRootPart.CFrame = v.Character.HumanoidRootPart.CFrame * CFrame.new(0,0,1)
@@ -545,14 +591,30 @@ local KillAll = Keybinds:AddBind({text = "Kill All", flag = "KillAllK", key = ""
      end 
 end})
 
-local KillSheriff = Keybinds:AddBind({text = "Kill Sheriff", flag = "KillSheriffR", key = "", callback = function() 
+local KillAll2 = Keybinds:AddBind({text = "Kill All 2", flag = "KillAll2", key = "", callback = function() 
+     for _, v in pairs(ReplicatedStorage.Interactions.Server.GetPlayingPlayers:InvokeServer()) do 
+         if v ~= Client and v.Character and Client.Character:FindFirstChild("Knife") then 
+             repeat 
+                 if v.Character:FindFirstChild("HumanoidRootPart") and v.Character:FindFirstChild("Humanoid") and v.Character.Humanoid.Health > 0 then 
+                     Client.Character.HumanoidRootPart.CFrame = v.Character.HumanoidRootPart.CFrame * CFrame.new(0,0,1)
+                     Client.Character.Knife.KnifeScript.HitPlayer:FireServer(v.Character.HumanoidRootPart)
+                     Client.Character.Knife.KnifeScript.ClientStab:FireServer()
+                 end 
+                 RunService.Heartbeat:Wait()
+             until not IsAlive(v)
+             wait(0.3)
+         end 
+     end 
+end})
+
+local KillSheriff = Keybinds:AddBind({text = "Kill Sheriff", flag = "KillSheriff", key = "", callback = function() 
      Client.Character.HumanoidRootPart.CFrame = GetSheriff().Character.HumanoidRootPart.CFrame * CFrame.new(3,0,0)
      wait(0.3)
      Client.Character.Knife.KnifeScript.HitPlayer:FireServer(GetSheriff().Character.HumanoidRootPart)
      Client.Character.Knife.KnifeScript.ClientStab:FireServer()
 end})
 
-local TeleportFoward = Keybinds:AddBind({text = "Teleport Foward", flag = "TeleportFowardF", key = "", callback = function() 
+local TeleportFoward = Keybinds:AddBind({text = "Teleport Foward", flag = "TeleportFoward", key = "", callback = function() 
      Client.Character.HumanoidRootPart.CFrame *= CFrame.new(0,0,-5)
 end})
 
@@ -575,11 +637,11 @@ local GrabGun = Keybinds:AddBind({text = "Grab Gun", flag = "GrabGun", key = "",
      end
 end})
 
-local LobbyTeleport = Keybinds:AddBind({text = "Lobby Teleport", flag = "GrabGun", key = "", callback = function() 
+local LobbyTeleport = Keybinds:AddBind({text = "Lobby Teleport", flag = "LobbyTeleport", key = "", callback = function() 
      Client.Character.HumanoidRootPart.CFrame = Workspace.Lobby.Spawns.Model.SpawnLocation.CFrame * CFrame.new(0,3,0)
 end})
 
-local GameTeleport = Keybinds:AddBind({text = "Game Teleport", flag = "GrabGun", key = "", callback = function() 
+local GameTeleport = Keybinds:AddBind({text = "Game Teleport", flag = "GameTeleport", key = "", callback = function() 
      Client.Character.HumanoidRootPart.CFrame = Workspace.Map.Spawn.CFrame * CFrame.new(0,3,0)
 end})
 
@@ -604,7 +666,7 @@ local ServerHop = Keybinds:AddBind({text = "ServerHop", flag = "ServerHop", key 
 end})
 
 local ChatRoles = Keybinds:AddBind({text = "Chat Roles", flag = "ChatRoles", key = "", callback = function() 
-     ReplicatedStorage.Interactions.Server.SendChatMessage:FireServer("The murderer is:" .. GetMurderer().Name .. " The sheriff is: " .. GetSheriff().Name)
+     ReplicatedStorage.Interactions.Server.SendChatMessage:FireServer("The murderer is: " .. GetMurderer().Name .. " The sheriff is: " .. GetSheriff().Name)
 end})
 
 BindConnection("PlayerLeft", Players.PlayerRemoving, function()
@@ -613,8 +675,11 @@ BindConnection("PlayerLeft", Players.PlayerRemoving, function()
      end
 end)
 
-BindConnection("CharacterAdded", Client.CharacterAdded, function()
+BindConnection("CharacterAdded", Client.CharacterAdded, function(Character)
      Stop()
+     if Library.flags.AutoGun and Workspace:FindFirstChild("RevolverPickUp") then 
+         Touch(Workspace.RevolverPickUp.Orb, Client.Character:WaitForChild("HumanoidRootPart"))
+     end 
 end)
 
 BindConnection("OnTeleport", Client.OnTeleport, function(State)
@@ -624,7 +689,56 @@ BindConnection("OnTeleport", Client.OnTeleport, function(State)
 end)
 
 BindConnection("ChildAdded", Workspace.ChildAdded, function(Child)
-    
+     if Child.Name == "RevolverPickUp" and Library.flags.AutoGun and Client.Character and Client.Character:FindFirstChild("HumanoidRootPart") then 
+         local Orb = Child:WaitForChild("Orb")
+         if Orb then 
+             Touch(Orb, Client.Character.HumanoidRootPart)
+         end 
+     end 
+end)
+
+for _, v in pairs(getconnections(Client.PlayerGui.MainGui.ChatTypeArea.TypeArea.FocusLost)) do 
+    v:Disable()
+end 
+
+BindConnection("FocusLost", Client.PlayerGui.MainGui.ChatTypeArea.TypeArea.FocusLost, function()
+     local Split = string.split(Client.PlayerGui.MainGui.ChatTypeArea.TypeArea.Text, " ")
+     if Split[1]:lower() == Prefix .. "goto" then 
+         local Players = GetPlayersByName(Split[2])
+         for _, v in pairs(Players) do 
+             if v.Character and v.Character:FindFirstChild("HumanoidRootPart") then 
+                 Client.Character.HumanoidRootPart.CFrame = v.Character.HumanoidRootPart.CFrame * CFrame.new(3,0,0)
+             end 
+         end 
+     elseif Split[1]:lower() == Prefix .. "kill" then 
+         local Players = GetPlayersByName(Split[2])
+         for _, v in pairs(Players) do 
+             if v.Character and v.Character:FindFirstChild("HumanoidRootPart") and v.Character:FindFirstChild("Humanoid") and v.Character.Humanoid.Health > 0 and Client.Character:FindFirstChild("Knife") then 
+                 Client.Character.HumanoidRootPart.CFrame = v.Character.HumanoidRootPart.CFrame * CFrame.new(0,0,1)
+                 Client.Knife.KnifeScript.HitPlayer:FireServer(v.Character.HumanoidRootPart)
+                 Client.Knife.KnifeScript.ClientStab:FireServer()
+             end 
+         end 
+     elseif Split[1]:lower() == Prefix .. "kill2" then 
+         local Players = GetPlayersByName(Split[2])
+         for _, v in pairs(Players) do 
+             if v.Character and Client.Character:FindFirstChild("Knife") then 
+                 repeat 
+                     if v.Character:FindFirstChild("HumanoidRootPart") and v.Character:FindFirstChild("Humanoid") and v.Character.Humanoid.Health > 0 then 
+                         Client.Character.HumanoidRootPart.CFrame = v.Character.HumanoidRootPart.CFrame * CFrame.new(0,0,1)
+                         Client.Knife.KnifeScript.HitPlayer:FireServer(v.Character.HumanoidRootPart)
+                         Client.Knife.KnifeScript.ClientStab:FireServer()
+                     else 
+                         break 
+                     end 
+                     RunService.Heartbeat:Wait()
+                 until not IsAlive(v)
+             end 
+         end 
+     else 
+         ReplicatedStorage.Interactions.Server.SendChatMessage:FireServer(Text)
+     end 
+     Client.PlayerGui.MainGui.ChatTypeArea.TypeArea.Text = ""
 end)
 
 local OldNameCall1 = nil 
