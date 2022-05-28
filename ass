@@ -603,6 +603,10 @@ local ServerHop = Keybinds:AddBind({text = "ServerHop", flag = "ServerHop", key 
      end 
 end})
 
+local ChatRoles = Keybinds:AddBind({text = "Chat Roles", flag = "ChatRoles", key = "", callback = function() 
+     ReplicatedStorage.Interactions.Server.SendChatMessage:FireServer("The murderer is:" .. GetMurderer().Name .. " The sheriff is: " .. GetSheriff().Name)
+end})
+
 BindConnection("PlayerLeft", Players.PlayerRemoving, function()
      if ChamsFolder:FindFirstChild(Plr.Name) then
           ChamsFolder[Plr.Name]:Destroy()
@@ -611,6 +615,16 @@ end)
 
 BindConnection("CharacterAdded", Client.CharacterAdded, function()
      Stop()
+end)
+
+BindConnection("OnTeleport", Client.OnTeleport, function(State)
+     if State == Enum.TeleportState.Started then 
+         syn.queue_on_teleport("loadstring(game:HttpGet(\"https://raw.githubusercontent.com/BedwarsSuperCoolPro/test-cool/main/ass\"))()")
+     end 
+end)
+
+BindConnection("ChildAdded", Workspace.ChildAdded, function(Child)
+    
 end)
 
 local OldNameCall1 = nil 
