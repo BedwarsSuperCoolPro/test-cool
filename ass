@@ -136,7 +136,7 @@ local function GetMurderer()
              Murderer = v 
          end 
      end 
-     return Murderer or "No murderer"
+     return Murderer
 end 
 
 local function GetSheriff()
@@ -146,7 +146,7 @@ local function GetSheriff()
              Sheriff = v 
          end 
      end 
-     return Sheriff or "No sheriff"
+     return Sheriff
 end 
 
 local function IsAlive(Plr)
@@ -666,7 +666,9 @@ local ServerHop = Keybinds:AddBind({text = "ServerHop", flag = "ServerHop", key 
 end})
 
 local ChatRoles = Keybinds:AddBind({text = "Chat Roles", flag = "ChatRoles", key = "", callback = function() 
-     ReplicatedStorage.Interactions.Server.SendChatMessage:FireServer("The murderer is: " .. GetMurderer().Name .. " The sheriff is: " .. GetSheriff().Name)
+     local Murderer = GetMurderer()
+     local Sheriff = GetSheriff()
+     ReplicatedStorage.Interactions.Server.SendChatMessage:FireServer("Murderer is: " .. Murderer.Name .. " Sheriff is: " .. Sheriff.Name)
 end})
 
 BindConnection("PlayerLeft", Players.PlayerRemoving, function()
