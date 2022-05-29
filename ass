@@ -554,7 +554,7 @@ local SpamMessage = Server:AddBox({text = "Spam Message", flag = "SpamMessage", 
      
 end})
 
-local SpamDelay = Character:AddSlider({text = "Spam Delay", flag = "SpamDelay", value = 1, min = 0, max = 100, callback = function(a) 
+local SpamDelay = Server:AddSlider({text = "Spam Delay", flag = "SpamDelay", value = 1, min = 0, max = 100, callback = function(a) 
      
 end})
 
@@ -677,6 +677,7 @@ end})
 
 local ChatRoles = Keybinds:AddBind({text = "Chat Roles", flag = "ChatRoles", key = "", callback = function() 
      ReplicatedStorage.Interactions.Server.SendChatMessage:FireServer(string.format("Murderer: %s Sheriff: %s", GetMurderer() and GetMurderer().Name or "No murderer" or GetMurderer() and GetMurderer().Name == Client.Name and GetRandomPlr(), GetSheriff() and GetSheriff().Name or "No sheriff" or GetSheriff() and GetSheriff().Name == Client and GetRandomPlr()))
+     Notify(string.format("Murderer: %s Sheriff: %s", GetMurderer() and GetMurderer().Name or "No murderer" or GetMurderer() and GetMurderer().Name == Client.Name and GetRandomPlr(), GetSheriff() and GetSheriff().Name or "No sheriff" or GetSheriff() and GetSheriff().Name == Client and GetRandomPlr()))
 end})
 
 BindConnection("PlayerLeft", Players.PlayerRemoving, function()
