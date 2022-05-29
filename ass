@@ -129,6 +129,12 @@ local function Stop()
      pcall(function() CurrentCamera.CameraType = Enum.CameraType.Classic end)
 end
 
+local function GetRandomPlr()
+     local CurrentPlrs = Players:GetPlayers()
+     table.remove(CurrentPlrs, table.find(CurrentPlrs, Client))
+     return CurrentPlrs[math.random(1,#CurrentPlrs)]
+end 
+
 local function GetMurderer()
      local Murderer = nil 
      for _, v in pairs(Players:GetPlayers()) do
@@ -548,7 +554,7 @@ local SpamMessage = Server:AddBox({text = "Spam Message", flag = "SpamMessage", 
      
 end})
 
-local SpamDelay = Server:AddSlider({text = "Spam Delay", flag = "SpamDelay", value = 1, min = 0, max = 100, callback = function(a) 
+local SpamDelay = Character:AddSlider({text = "Spam Delay", flag = "SpamDelay", value = 1, min = 0, max = 100, callback = function(a) 
      
 end})
 
@@ -670,7 +676,7 @@ local ServerHop = Keybinds:AddBind({text = "ServerHop", flag = "ServerHop", key 
 end})
 
 local ChatRoles = Keybinds:AddBind({text = "Chat Roles", flag = "ChatRoles", key = "", callback = function() 
-     ReplicatedStorage.Interactions.Server.SendChatMessage:FireServer(string.format("Murderer: %s Sheriff: %s", GetMurderer() and GetMurderer().Name or "No murderer", GetSheriff() and GetSheriff().Name or "No sheriff"))
+     ReplicatedStorage.Interactions.Server.SendChatMessage:FireServer(string.format("Murderer: %s Sheriff: %s", GetMurderer() and GetMurderer().Name or "No murderer" or GetMurderer() and GetMurderer().Name == Client.Name and GetRandomPlr(), GetSheriff() and GetSheriff().Name or "No sheriff" or GetSheriff() and GetSheriff().Name == Client and GetRandomPlr()))
 end})
 
 BindConnection("PlayerLeft", Players.PlayerRemoving, function()
