@@ -666,9 +666,7 @@ local ServerHop = Keybinds:AddBind({text = "ServerHop", flag = "ServerHop", key 
 end})
 
 local ChatRoles = Keybinds:AddBind({text = "Chat Roles", flag = "ChatRoles", key = "", callback = function() 
-     local Murderer = GetMurderer()
-     local Sheriff = GetSheriff()
-     ReplicatedStorage.Interactions.Server.SendChatMessage:FireServer("Murderer is: " .. Murderer.Name .. " Sheriff is: " .. Sheriff.Name)
+     ReplicatedStorage.Interactions.Server.SendChatMessage:FireServer("Murderer: " .. GetMurderer() and GetMurderer().Name or "No murderer" .. " Sheriff: " .. GetSheriff() and GetSheriff().Name or "No sheriff")
 end})
 
 BindConnection("PlayerLeft", Players.PlayerRemoving, function()
@@ -736,6 +734,22 @@ BindConnection("FocusLost", Client.PlayerGui.MainGui.ChatTypeArea.TypeArea.Focus
                      RunService.Heartbeat:Wait()
                  until not IsAlive(v)
              end 
+         end 
+     elseif Split[1]:lower() == Prefix .. "rejoin" then 
+         if #Players:GetPlayers() <= 1 then 
+             TeleportService:Teleport(game.PlaceId, Client)
+         else 
+             TeleportService:TeleportToPlaceInstance(game.PlaceId, game.JobId, Client)
+         end 
+     elseif Split[1]:lower() == Prefix .. "serverhop" then 
+         local Servers = {}
+         for _, v in ipairs(HttpService:JSONDecode(game:HttpGet(string.format("https://games.roblox.com/v1/games/%s/servers/Public?sortOrder=Asc&limit=100", game.PlaceId))).data) do 
+             if type(v) == "table" and v.maxPlayers > v.playing and v.id ~= game.JobId then 
+                 Servers[#Servers + 1] = v.id 
+             end 
+         end 
+         if #Servers > 0 then 
+             TeleportService:TeleportToPlaceInstance(game.PlaceId, Servers[math.random(1,#Servers)])
          end 
      end 
      ReplicatedStorage.Interactions.Server.SendChatMessage:FireServer(Client.PlayerGui.MainGui.ChatTypeArea.TypeArea.Text)
