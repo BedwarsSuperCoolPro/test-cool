@@ -548,8 +548,12 @@ local SpamMessage = Server:AddBox({text = "Spam Message", flag = "SpamMessage", 
      
 end})
 
+local SpamDelay = Server:AddSlider({text = "Spam Delay", flag = "SpamDelay", value = 1, min = 0, max = 100, callback = function(a) 
+     
+end})
+
 local Spam = Server:AddToggle({text = "Spam", flag = "Spam", state = false, callback = function(a) 
-     while Library.flags.Spam do wait()
+     while Library.flags.Spam do wait(SpamDelay)
           if Library.flags.SpamMessage ~= "Message Here" then
                ReplicatedStorage.Interactions.Server.SendChatMessage:FireServer(Library.flags.SpamMessage)
           end
@@ -570,9 +574,9 @@ local Spasm = Server:AddToggle({text = "Spasm", flag = "Spasm", state = false, c
      if a then 
          BindToRenderStep("Spasm", function()
              ReplicatedStorage.Interactions.Server.SendChatMessage:FireServer("/e die")
-             wait(0.08)
+             wait(0.06)
              ReplicatedStorage.Interactions.Server.SendChatMessage:FireServer("/e sit")
-             wait(0.08)
+             wait(0.06)
              ReplicatedStorage.Interactions.Server.SendChatMessage:FireServer("/e spin")
          end)
      else 
