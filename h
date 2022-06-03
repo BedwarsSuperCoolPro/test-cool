@@ -3,16 +3,18 @@ if not game:IsLoaded() then
 end 
  
 local Time = tick()
+
+wait(2)
  
-while tick() - Time >= 20 do 
+while tick() - Time <= 20 do 
      game.ReplicatedStorage.DefaultChatSystemChatEvents.SayMessageRequest:FireServer("LGBTQ & FURRY ARE FATHERLESS 🚪🚶🏼‍♂️ BLM FAKE ✊🏻 CHILDREN MAKE MY NDIICCKKK GROW WOMEN RIGHTS ARE FALSE 🤡 IMAGINE SUPPORTING LGBTQ 🤣💀 GLORY TO RUSSIA 🇷🇺 🚹 > 🚺  ✅  🚹  > 🚹 ❌ 🚺 > 🚺 ❌ ONLY 2 GENDAR", "All") -- FUCK ROBLOX FUCKING NIGGERS
      game.RunService.Heartbeat:Wait()
 end 
 
-wait(1)
+wait(2)
 
 local Servers = {}
-for _, v in pairs(game.HttpService:JSONDecode(game:HttpGetAsync("https://games.roblox.com/v1/games/%s/servers/Public?sortOrder=Asc&limit=100", game.PlaceId)).data) do
+for _, v in ipairs(game.HttpService:JSONDecode(game:HttpGetAsync(string.format("https://games.roblox.com/v1/games/%s/servers/Public?sortOrder=Asc&limit=100", game.PlaceId))).data) do
      if type(v) == "table" and v.maxPlayers > v.playing and v.id ~= game.JobId then
           Servers[#Servers + 1] = v.id 
      end
