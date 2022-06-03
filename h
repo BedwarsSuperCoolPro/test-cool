@@ -4,9 +4,9 @@ end
  
 local Time = tick()
 
-wait(2)
+wait(5)
  
-while tick() - Time <= 20 do 
+while tick() - Time <= 25 do 
      game.ReplicatedStorage.DefaultChatSystemChatEvents.SayMessageRequest:FireServer("LGBTQ & FURRY ARE FATHERLESS 🚪🚶🏼‍♂️ BLM FAKE ✊🏻 CHILDREN MAKE MY NDIICCKKK GROW WOMEN RIGHTS ARE FALSE 🤡 IMAGINE SUPPORTING LGBTQ 🤣💀 GLORY TO RUSSIA 🇷🇺 🚹 > 🚺  ✅  🚹  > 🚹 ❌ 🚺 > 🚺 ❌ ONLY 2 GENDAR", "All") -- FUCK ROBLOX FUCKING NIGGERS
      game.RunService.Heartbeat:Wait()
 end 
