@@ -8,7 +8,7 @@ local function ServerHop()
     
     local Servers = {} 
     for _, v in pairs(HttpService:JSONDecode(game:HttpGetAsync(string.format("https://games.roblox.com/v1/games/%s/servers/Public?sortOrder=Asc&limit=100", game.PlaceId))).data) do 
-        if type(v) == "table" and v.playing < v.maxPlayers and v.id ~= game.JobId then 
+        if type(v) == "table" and v.maxPlayers > v.playing and v.id ~= game.JobId then 
             Servers[Servers + 1] = v.id 
         end 
     end 
