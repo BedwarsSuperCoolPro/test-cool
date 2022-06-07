@@ -22,9 +22,8 @@ end
 local LPlr = game:GetService("Players").LocalPlayer
 local Char = LPlr.CharacterAdded:Wait()
 local Root = Char:WaitForChild("HumanoidRootPart")
+local Part = Workspace:WaitForChild("Maps"):WaitForChild("End"):WaitForChild("Light")
 
-firetouchinterest(game:GetService("Workspace").Maps.End.Light, Root, 0)
-
+firetouchinterest(Part, Root, 0)
 wait(1)
-
 ServerHop()
