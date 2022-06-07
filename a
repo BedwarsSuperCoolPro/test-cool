@@ -1,0 +1,30 @@
+if not game:IsLoaded() then 
+    game.Loaded:Wait()
+end 
+
+local function ServerHop()
+    local HttpService = game:GetService("HttpService")
+    local TeleportService = game:GetService("TeleportService")
+    
+    local Servers = {} 
+    for _, v in pairs(HttpService:JSONDecode(game:HttpGetAsync(string.format("https://games.roblox.com/v1/games/%s/servers/Public?sortOrder=Asc&limit=100", game.PlaceId))).data) do 
+        if type(v) == "table" and v.playing < v.maxPlayers and v.id ~= game.JobId then 
+            Servers[Servers + 1] = v.id 
+        end 
+    end 
+    
+    if #Servers > 0 then 
+        syn.queue_on_teleport("loadstring(game:HttpGet(\"https://raw.githubusercontent.com/fatesc/fates-admin/main/main.lua\"))()")
+        TeleportService:TeleportToPlaceInstance(game.PlaceId, Servers[math.random(1,#Servers)])
+    end 
+end 
+
+local LPlr = game:GetService("Players").LocalPlayer
+local Char = LPlr.CharacterAdded:Wait()
+local Root = Char:WaitForChild("HumanoidRootPart")
+
+firetouchinterest(game:GetService("Workspace").Maps.End.Light, Root, 0)
+
+wait(1)
+
+ServerHop()
